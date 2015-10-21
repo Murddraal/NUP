@@ -1,0 +1,106 @@
+Microsoft (R) Macro Assembler Version 14.00.23026.0	    10/04/15 15:07:14
+main.asm						     Page 1 - 1
+
+
+				.386
+				.MODEL FLAT, STDCALL
+				OPTION CASEMAP: NONE
+													; прототипы внешних функций (процедур) описываютс€ директивой EXTERN, 
+													; после знака @ указываетс€ обща€ длина передаваемых параметров,
+													; после двоеточи€ указываетс€ тип внешнего объекта Ц процедура
+				EXTERN  GetStdHandle@4: PROC	;дескриптор ввода-вывода
+				EXTERN  WriteConsoleA@20: PROC	;вывод текста
+				EXTERN  CharToOemA@8: PROC		;перекодировка
+				EXTERN  ReadConsoleA@20: PROC	;ввод с консоли
+				EXTERN  ExitProcess@4: PROC; функци€ выхода из программы
+				EXTERN  lstrlenA@4: PROC; функци€ определени€ длины строки
+				EXTERN  wsprintfA: PROC; т.к. число параметров функции не фиксировано,
+							; используетс€ соглашение, согласно которому очищает стек 
+							; вызывающа€ процедура
+
+ 00000000			.DATA; сегмент данных
+ 00000000 C2 E2 E5 E4 E8	STRN DB "¬ведите число: ",13,10,0; выводима€ строка, в конце добавлены
+	   F2 E5 20 F7 E8
+	   F1 EB EE 3A 20
+	   0D 0A 00
+				; управл€ющие символы: 13 Ц возврат каретки, 10 Ц переход на новую 
+				; строку, 0 Ц конец строки; с использованием директивы DB 
+				; резервируетс€ массив байтов
+ 00000012 00000000		DIN DD ?; дескриптор ввода; директива DD резервирует пам€ть объемом
+				; 32 бита (4 байта), знак Ђ?ї используетс€ дл€ неинициализированных данных
+ 00000016 00000000		DOUT DD ?; дескриптор вывода
+ 0000001A  00000028 [		BUF  DB 40 dup (?); буфер дл€ вводимых/выводимых строк длиной 40 байтов
+	    00
+	   ]
+ 00000042 00000000		LENS DD ?; переменна€ дл€ количества выведенных символов
+ 00000046 00000000		NUM_X DD ?	;1
+ 0000004A 00000000		NUM_Y DD ?	;2
+
+ 00000000			.CODE; сегмент кода 
+ 00000000			MAIN PROC; начало описани€ процедуры с именем MAIN
+				; перекодируем строку STRN
+
+ 00000000  FF 35 00000016 R	PUSH DOUT
+ 00000006  E8 00000000 E	CALL WriteConsoleA@20
+				; небольша€ задержка
+ 0000000B  B9 3FFFFFFF		MOV ECX,03FFFFFFFH; помещение в регистр ECX Ц счетчик цикла Ц
+				; большого значени€
+ 00000010  E2 FE		L1: LOOP L1; цикл без тела
+				; выход из программы 
+ 00000012  6A 00		PUSH 0; параметр: код выхода
+ 00000014  E8 00000000 E	CALL ExitProcess@4
+ 00000019			MAIN ENDP; завершение описани€ процедуры с именем MAIN
+				END MAIN; завершение описани€ модул€ с указанием первой выполн€емой процедуры
+Microsoft (R) Macro Assembler Version 14.00.23026.0	    10/04/15 15:07:14
+main.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+FLAT . . . . . . . . . . . . . .	GROUP
+_DATA  . . . . . . . . . . . . .	32 Bit	 0000004E DWord	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000019 DWord	  Public  'CODE'	
+
+
+Procedures, parameters, and locals:
+
+                N a m e                 Type     Value    Attr
+
+MAIN . . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000019 Public STDCALL
+  L1 . . . . . . . . . . . . . .	L Near	 00000010 _TEXT	
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+@CodeSize  . . . . . . . . . . .	Number	 00000000h   
+@DataSize  . . . . . . . . . . .	Number	 00000000h   
+@Interface . . . . . . . . . . .	Number	 00000003h   
+@Model . . . . . . . . . . . . .	Number	 00000007h   
+@code  . . . . . . . . . . . . .	Text   	 _TEXT
+@data  . . . . . . . . . . . . .	Text   	 FLAT
+@fardata?  . . . . . . . . . . .	Text   	 FLAT
+@fardata . . . . . . . . . . . .	Text   	 FLAT
+@stack . . . . . . . . . . . . .	Text   	 FLAT
+BUF  . . . . . . . . . . . . . .	Byte	 0000001A _DATA	
+CharToOemA@8 . . . . . . . . . .	L Near	 00000000 FLAT	External STDCALL
+DIN  . . . . . . . . . . . . . .	DWord	 00000012 _DATA	
+DOUT . . . . . . . . . . . . . .	DWord	 00000016 _DATA	
+ExitProcess@4  . . . . . . . . .	L Near	 00000000 FLAT	External STDCALL
+GetStdHandle@4 . . . . . . . . .	L Near	 00000000 FLAT	External STDCALL
+LENS . . . . . . . . . . . . . .	DWord	 00000042 _DATA	
+NUM_X  . . . . . . . . . . . . .	DWord	 00000046 _DATA	
+NUM_Y  . . . . . . . . . . . . .	DWord	 0000004A _DATA	
+ReadConsoleA@20  . . . . . . . .	L Near	 00000000 FLAT	External STDCALL
+STRN . . . . . . . . . . . . . .	Byte	 00000000 _DATA	
+WriteConsoleA@20 . . . . . . . .	L Near	 00000000 FLAT	External STDCALL
+lstrlenA@4 . . . . . . . . . . .	L Near	 00000000 FLAT	External STDCALL
+wsprintfA  . . . . . . . . . . .	L Near	 00000000 FLAT	External STDCALL
+
+	   0 Warnings
+	   0 Errors
