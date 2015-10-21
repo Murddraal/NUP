@@ -67,17 +67,6 @@ SUB LENS, 2
 MOV ECX, LENS
 MOV ESI, OFFSET BUF
 
-TOSTACK:
-	PUSH [ESI]
-	INC ESI
-LOOP TOSTACK 
-
-MOV ESI, OFFSET INVERT
-MOV ECX, LENS
-FROMSTACK:
-	POP [ESI]
-	INC ESI
-LOOP  FROMSTACK
 ;_____Вывод инвертированной строки___
 
 MOV  EAX, OFFSET INVERT;	командой MOV  значение второго операнда  перемещается в первый, OFFSET – операция, возвращающая адрес
