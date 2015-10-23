@@ -20,7 +20,8 @@ DIN DD ?; дескриптор ввода; директива DD резервирует память объемом 32 бита (4 б
 DOUT DD ?; дескриптор вывода
 BUF  DB 200 dup (?); буфер для вводимых/выводимых строк длиной 200 байтов
 INVERT  DB 200 dup (?)
-LENS DD ?; переменная для количества выведенных символов
+LGT_M DD ?; переменная для количества выведенных символов
+LGT_L DD ?
 ETH DD 8
 TEN DD 10
 FLAG DD 0
@@ -47,7 +48,7 @@ MOV DOUT, EAX  ; определим длину строки STRN
 PUSH OFFSET STRN1; в стек помещается адрес строки
 CALL lstrlenA@4; длина в EAX вызов функции WriteConsoleA для вывода строки STRN
 PUSH 0; в стек помещается 5-й параметр
-PUSH OFFSET LENS; 4-й параметр
+PUSH OFFSET LGT_M; 4-й параметр
 PUSH EAX; 3-й параметр
 PUSH OFFSET STRN1; 2-й параметр
 PUSH DOUT; 1-й параметр
@@ -56,18 +57,35 @@ CALL WriteConsoleA@20; ввод строки
 ;_______________________Ввод строки____________________________________________________________
 
 PUSH 0; в стек помещается 5-й параметр
-PUSH OFFSET LENS; 4-й параметр
+PUSH OFFSET LGT_M; 4-й параметр
 PUSH 200; 3-й параметр
 PUSH OFFSET BUF; 2-й параметр
 PUSH DIN; 1-й параметр
 CALL ReadConsoleA@20 
 
 ;________________________Инвертирование строки_____________________________________________________
-SUB LENS, 2
-MOV ECX, LENS
-MOV ESI, OFFSET BUF
+MOV ESI, LGT_M
+MOV LGT_L, ESI
 
-;_____Вывод инвертированной строки___
+SUB LGT_L, 2
+MOV ECX, LGT_L
+MOV ESI, OFFSET BUF
+ADD ESI, LGT_L
+SUB ESI, 1
+MOV EDI, OFFSET INVERT
+INVERTISE:
+	MOV BL, [ESI]
+	MOV [EDI], BL
+	DEC ESI
+	INC EDI
+LOOP INVERTISE
+MOV BL, 13
+MOV [EDI], BL
+INC EDI
+MOV BL, 10
+MOV [EDI], BL
+
+;_____________________Вывод инвертированной строки__________________
 
 MOV  EAX, OFFSET INVERT;	командой MOV  значение второго операнда  перемещается в первый, OFFSET – операция, возвращающая адрес
 PUSH EAX; параметры функции помещаются в стек командой PUSH
@@ -77,14 +95,16 @@ CALL CharToOemA@8; вызов функции получим дескриптор ввода
 
 
 PUSH 0; в стек помещается 5-й параметр
-PUSH OFFSET LENS; 4-й параметр
-PUSH LENS; 3-й параметр
+PUSH OFFSET LGT_M; 4-й параметр
+PUSH LGT_M; 3-й параметр
 PUSH OFFSET INVERT; 2-й параметр
 PUSH DOUT; 1-й параметр
 CALL WriteConsoleA@20; ввод строки
 ;_______________________Сравнение строк_________________
 CLD
-MOV ECX, LENS
+MOV ECX, LGT_L
+MOV ESI, OFFSET BUF
+MOV EDI, OFFSET INVERT
 REPE CMPS BUF, INVERT
 CMP ECX, 0
 JE NOCHANGES
@@ -107,7 +127,7 @@ MOV DOUT, EAX  ; определим длину строки STRN
 PUSH OFFSET STRN3; в стек помещается адрес строки
 CALL lstrlenA@4; длина в EAX вызов функции WriteConsoleA для вывода строки STRN
 PUSH 0; в стек помещается 5-й параметр
-PUSH OFFSET LENS; 4-й параметр
+PUSH OFFSET LGT_L; 4-й параметр
 PUSH EAX; 3-й параметр
 PUSH OFFSET STRN3; 2-й параметр
 PUSH DOUT; 1-й параметр
@@ -130,7 +150,7 @@ MOV DOUT, EAX  ; определим длину строки STRN
 PUSH OFFSET STRN2; в стек помещается адрес строки
 CALL lstrlenA@4; длина в EAX вызов функции WriteConsoleA для вывода строки STRN
 PUSH 0; в стек помещается 5-й параметр
-PUSH OFFSET LENS; 4-й параметр
+PUSH OFFSET LGT_L; 4-й параметр
 PUSH EAX; 3-й параметр
 PUSH OFFSET STRN2; 2-й параметр
 PUSH DOUT; 1-й параметр
@@ -143,7 +163,7 @@ PAUS:
 ;_______________________________Пауза_________________________________
 
 	PUSH 0; в стек помещается 5-й параметр
-	PUSH OFFSET LENS; 4-й параметр
+	PUSH OFFSET LGT_L; 4-й параметр
 	PUSH 200; 3-й параметр
 	PUSH OFFSET BUF; 2-й параметр
 	PUSH DIN; 1-й параметр

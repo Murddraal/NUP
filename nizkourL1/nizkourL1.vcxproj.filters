@@ -15,8 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="main.asm">
+    <MASM Include="function.asm">
       <Filter>Файлы ресурсов</Filter>
     </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
